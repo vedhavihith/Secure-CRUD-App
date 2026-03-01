@@ -4,27 +4,37 @@ include 'db.php';
 
 if (!isset($_SESSION['user'])) {
     header("Location: login.php");
+    exit();
 }
 
-$id = $_GET['id'];
+if ($_SESSION['role'] != 'admin') {
+    die("Access Denied");
+}
 
-$result = mysqli_query($conn, "SELECT * FROM posts WHERE id=$id");
-$post = mysqli_fetch_assoc($result);
+$id = intval($_GET['id']);
+
+$stmt = $conn->prepare("SELECT * FROM posts WHERE id=?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+$post = $result->fetch_assoc();
+$stmt->close();
 
 if (isset($_POST['update'])) {
-    $title = $_POST['title'];
-    $content = $_POST['content'];
 
-    mysqli_query($conn, "UPDATE posts SET title='$title', content='$content' WHERE id=$id");
+    $title = trim($_POST['title']);
+    $content = trim($_POST['content']);
+
+    if (empty($title) || empty($content)) {
+        die("All fields are required!");
+    }
+
+    $stmt = $conn->prepare("UPDATE posts SET title=?, content=? WHERE id=?");
+    $stmt->bind_param("ssi", $title, $content, $id);
+    $stmt->execute();
+    $stmt->close();
+
     header("Location: view.php");
+    exit();
 }
 ?>
-
-<h2>Edit Post</h2>
-
-<form method="post">
-    Title: <input type="text" name="title" value="<?php echo $post['title']; ?>"><br><br>
-    Content:<br>
-    <textarea name="content"><?php echo $post['content']; ?></textarea><br><br>
-    <button name="update">Update</button>
-</form>
