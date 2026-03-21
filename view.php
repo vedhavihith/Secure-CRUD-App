@@ -57,7 +57,7 @@ $total_pages = ceil($total_posts / $limit);
 
 <!-- SEARCH FORM -->
 <form method="GET" class="d-flex mb-4">
-    <input type="text" name="search"class="form-control me-2"placeholder="Search posts..."value="<?php echo $search; ?>">
+    <input type="text" name="search"class="form-control me-2"placeholder="Search posts..."value="<?php echo htmlspecialchars($search); ?>">
     <button class="btn btn-primary">Search</button>
 </form>
 
@@ -66,8 +66,8 @@ $total_pages = ceil($total_posts / $limit);
     <?php while ($row = mysqli_fetch_assoc($result)) { ?>
         <div class="card mb-3 shadow-sm">
             <div class="card-body">
-                <h5 class="card-title"><?php echo $row['title']; ?></h5>
-                <p class="card-text"><?php echo $row['content']; ?></p>
+                <h5 class="card-title"><?php echo htmlspecialchars($row['title']); ?></h5>
+                <p class="card-text"><?php echo htmlspecialchars($row['content']); ?></p>
 
                 <a href="edit.php?id=<?php echo $row['id']; ?>"class="btn btn-warning btn-sm">Edit</a>
 
